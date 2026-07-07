@@ -1,0 +1,11 @@
+"""Constants for the business directory scraper."""
+
+BASE_URL = "https://example-business-directory.com"
+SEARCH_PATH = "/search"
+LISTING_SELECTOR = ".listing-card"
+NEXT_PAGE_SELECTOR = ".pagination-next"
+NAME_SELECTOR = ".listing-name"
+PHONE_SELECTOR = ".listing-phone"
+WEBSITE_SELECTOR = ".listing-website a"
+ADDRESS_SELECTOR = ".listing-address"
+CATEGORY_SELECTOR = ".listing-category"
