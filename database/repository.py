@@ -84,6 +84,17 @@ class LeadRepository:
         results = self._session.execute(statement).scalars().all()
         return [self._from_orm(row) for row in results]
 
+    def count_leads(self) -> int:
+        """Return the total number of leads in persistence."""
+        statement = select(func.count()).select_from(LeadORM)
+        return int(self._session.execute(statement).scalar_one())
+
+    def list_all_leads(self) -> list[Lead]:
+        """Return all leads in persistence."""
+        statement = select(LeadORM)
+        results = self._session.execute(statement).scalars().all()
+        return [self._from_orm(row) for row in results]
+
     def search_leads(
         self,
         query: str,
