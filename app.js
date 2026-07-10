@@ -1,4 +1,8 @@
 // Lead Intelligence Dashboard
+const API_BASE = (window.location.protocol === "file:" || !window.location.port)
+    ? "http://localhost:5000"
+    : "";   // same origin when served by Flask
+
 class LeadsDashboard {
     constructor() {
         this.leads = [];
@@ -33,6 +37,7 @@ class LeadsDashboard {
         this.campLocation = document.getElementById("camp-location");
         this.campLimit = document.getElementById("camp-limit");
         this.campWebsite = document.getElementById("camp-website");
+        this.campDirUrl = document.getElementById("camp-dir-url");
     }
 
     bindEvents() {
@@ -46,32 +51,47 @@ class LeadsDashboard {
         this.refreshBtn.addEventListener("click", () => this.loadLeads());
         this.startCampaignBtn.addEventListener("click", () => this.startCampaign());
         this.campSource.addEventListener("change", () => this.onSourceChange());
+        this.onSourceChange(); // set initial visibility
     }
 
     onSourceChange() {
-        const isWebsite = this.campSource.value === "website";
-        document.getElementById("group-keyword").style.display = isWebsite ? "none" : "";
-        document.getElementById("group-industry").style.display = isWebsite ? "none" : "";
-        document.getElementById("group-location").style.display = isWebsite ? "none" : "";
-        document.getElementById("group-limit").style.display = isWebsite ? "none" : "";
-        document.getElementById("group-website").style.display = isWebsite ? "" : "none";
+        const src = this.campSource.value;
+        const show = (id) => document.getElementById(id).style.display = "";
+        const hide = (id) => document.getElementById(id).style.display = "none";
+
+        // Reset all
+        hide("group-dir-url"); hide("group-keyword"); hide("group-location");
+        hide("group-industry"); hide("group-limit"); hide("group-website");
+
+        if (src === "directory") {
+            show("group-dir-url"); show("group-keyword"); show("group-location"); show("group-limit");
+        } else if (src === "opencorporates") {
+            show("group-keyword"); show("group-location"); show("group-industry"); show("group-limit");
+        } else if (src === "website") {
+            show("group-website");
+        }
     }
 
     async startCampaign() {
         const source = this.campSource.value;
-        const payload = source === "website"
-            ? { source, website_url: this.campWebsite.value.trim() }
-            : {
-                source,
-                keyword: this.campKeyword.value.trim() || "software",
-                industry: this.campIndustry.value.trim() || null,
-                location: this.campLocation.value.trim() || "US",
-                limit: parseInt(this.campLimit.value) || 20,
-              };
+        let payload = { source };
 
-        if (source === "website" && !payload.website_url) {
-            alert("Please enter a website URL.");
-            return;
+        if (source === "directory") {
+            const dirUrl = this.campDirUrl.value.trim();
+            if (!dirUrl) { alert("Please enter a Directory URL (e.g. https://www.allbiz.com/businesses/software/California)"); return; }
+            payload.website_url = dirUrl;
+            payload.keyword = this.campKeyword.value.trim() || "";
+            payload.location = this.campLocation.value.trim() || "";
+            payload.limit = parseInt(this.campLimit.value) || 20;
+        } else if (source === "opencorporates") {
+            payload.keyword = this.campKeyword.value.trim() || "software";
+            payload.industry = this.campIndustry.value.trim() || null;
+            payload.location = this.campLocation.value.trim() || "US";
+            payload.limit = parseInt(this.campLimit.value) || 20;
+        } else if (source === "website") {
+            const url = this.campWebsite.value.trim();
+            if (!url) { alert("Please enter a company website URL."); return; }
+            payload.website_url = url;
         }
 
         this.startCampaignBtn.disabled = true;
@@ -79,7 +99,7 @@ class LeadsDashboard {
         this.setProgress(5, "Sending request to API…");
 
         try {
-            const resp = await fetch("/api/campaign/start", {
+            const resp = await fetch(`${API_BASE}/api/campaign/start`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -99,7 +119,7 @@ class LeadsDashboard {
     pollCampaign(jobId) {
         const poll = async () => {
             try {
-                const resp = await fetch(`/api/campaign/status/${jobId}`);
+                const resp = await fetch(`${API_BASE}/api/campaign/status/${jobId}`);
                 const job = await resp.json();
                 this.setProgress(job.progress || 0, job.message || "Running…");
                 if (job.status === "done") {
@@ -125,7 +145,7 @@ class LeadsDashboard {
     async loadLeads() {
         try {
             // Try to load from API first, fallback to static data
-            const response = await fetch("/api/leads", { headers: { "Accept": "application/json" } }).catch(() => null);
+            const response = await fetch(`${API_BASE}/api/leads`, { headers: { "Accept": "application/json" } }).catch(() => null);
             if (response && response.ok) {
                 this.leads = await response.json();
             } else {
