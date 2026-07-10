@@ -40,7 +40,7 @@ class WebsiteAdapter(BaseAdapter):
         self._cache: dict[str, tuple[float, list[Lead]]] = {}
 
     def fetch(self, *args: Any, **kwargs: Any) -> list[Lead]:
-        target_url = kwargs.get("url") or args[0] if args else ""
+        target_url = kwargs.get("url") or (args[0] if args else "")
         if not target_url:
             raise AdapterError("A website URL is required")
 

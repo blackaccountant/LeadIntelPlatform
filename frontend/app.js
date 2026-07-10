@@ -22,6 +22,17 @@ class LeadsDashboard {
         this.pageInfo = document.getElementById("page-info");
         this.exportBtn = document.getElementById("export-btn");
         this.refreshBtn = document.getElementById("refresh-btn");
+        // Campaign engine
+        this.startCampaignBtn = document.getElementById("start-campaign-btn");
+        this.campaignStatus = document.getElementById("campaign-status");
+        this.progressFill = document.getElementById("progress-fill");
+        this.campaignMessage = document.getElementById("campaign-message");
+        this.campSource = document.getElementById("camp-source");
+        this.campKeyword = document.getElementById("camp-keyword");
+        this.campIndustry = document.getElementById("camp-industry");
+        this.campLocation = document.getElementById("camp-location");
+        this.campLimit = document.getElementById("camp-limit");
+        this.campWebsite = document.getElementById("camp-website");
     }
 
     bindEvents() {
@@ -33,6 +44,82 @@ class LeadsDashboard {
         this.nextBtn.addEventListener("click", () => this.nextPage());
         this.exportBtn.addEventListener("click", () => this.exportCSV());
         this.refreshBtn.addEventListener("click", () => this.loadLeads());
+        this.startCampaignBtn.addEventListener("click", () => this.startCampaign());
+        this.campSource.addEventListener("change", () => this.onSourceChange());
+    }
+
+    onSourceChange() {
+        const isWebsite = this.campSource.value === "website";
+        document.getElementById("group-keyword").style.display = isWebsite ? "none" : "";
+        document.getElementById("group-industry").style.display = isWebsite ? "none" : "";
+        document.getElementById("group-location").style.display = isWebsite ? "none" : "";
+        document.getElementById("group-limit").style.display = isWebsite ? "none" : "";
+        document.getElementById("group-website").style.display = isWebsite ? "" : "none";
+    }
+
+    async startCampaign() {
+        const source = this.campSource.value;
+        const payload = source === "website"
+            ? { source, website_url: this.campWebsite.value.trim() }
+            : {
+                source,
+                keyword: this.campKeyword.value.trim() || "software",
+                industry: this.campIndustry.value.trim() || null,
+                location: this.campLocation.value.trim() || "US",
+                limit: parseInt(this.campLimit.value) || 20,
+              };
+
+        if (source === "website" && !payload.website_url) {
+            alert("Please enter a website URL.");
+            return;
+        }
+
+        this.startCampaignBtn.disabled = true;
+        this.campaignStatus.style.display = "flex";
+        this.setProgress(5, "Sending request to API…");
+
+        try {
+            const resp = await fetch("/api/campaign/start", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+            if (!resp.ok) {
+                const err = await resp.json().catch(() => ({}));
+                throw new Error(err.error || `HTTP ${resp.status}`);
+            }
+            const { job_id } = await resp.json();
+            this.pollCampaign(job_id);
+        } catch (err) {
+            this.setProgress(0, `Error: ${err.message}`);
+            this.startCampaignBtn.disabled = false;
+        }
+    }
+
+    pollCampaign(jobId) {
+        const poll = async () => {
+            try {
+                const resp = await fetch(`/api/campaign/status/${jobId}`);
+                const job = await resp.json();
+                this.setProgress(job.progress || 0, job.message || "Running…");
+                if (job.status === "done") {
+                    this.startCampaignBtn.disabled = false;
+                    this.loadLeads();   // Refresh table with new data
+                } else if (job.status === "error") {
+                    this.startCampaignBtn.disabled = false;
+                } else {
+                    setTimeout(poll, 1500);
+                }
+            } catch {
+                setTimeout(poll, 2000);
+            }
+        };
+        setTimeout(poll, 1000);
+    }
+
+    setProgress(pct, msg) {
+        this.progressFill.style.width = `${pct}%`;
+        this.campaignMessage.textContent = msg;
     }
 
     async loadLeads() {
