@@ -37,6 +37,14 @@ def create_api_app(db_manager: DatabaseManager) -> Flask:
                         "industry": lead.company.industry.value if hasattr(lead.company.industry, "value") and lead.company else "",
                     },
                     "website": lead.company.website if lead.company else None,
+                    "contact_name": (
+                        f"{lead.contact.first_name} {lead.contact.last_name}".strip()
+                        if lead.contact
+                        else None
+                    ),
+                    "contact_title": lead.contact.title if lead.contact else None,
+                    "contact_email": lead.contact.email if lead.contact else None,
+                    "contact_phone": lead.contact.phone if lead.contact else None,
                     "email": lead.contact.email if lead.contact else None,
                     "phone": lead.contact.phone if lead.contact else None,
                     "status": lead.status.value if hasattr(lead.status, "value") else str(lead.status),
@@ -71,6 +79,14 @@ def create_api_app(db_manager: DatabaseManager) -> Flask:
                     "industry": lead.company.industry.value if hasattr(lead.company.industry, "value") and lead.company else "",
                 },
                 "website": lead.company.website if lead.company else None,
+                "contact_name": (
+                    f"{lead.contact.first_name} {lead.contact.last_name}".strip()
+                    if lead.contact
+                    else None
+                ),
+                "contact_title": lead.contact.title if lead.contact else None,
+                "contact_email": lead.contact.email if lead.contact else None,
+                "contact_phone": lead.contact.phone if lead.contact else None,
                 "email": lead.contact.email if lead.contact else None,
                 "phone": lead.contact.phone if lead.contact else None,
                 "status": lead.status.value if hasattr(lead.status, "value") else str(lead.status),

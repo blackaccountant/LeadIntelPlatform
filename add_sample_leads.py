@@ -24,14 +24,16 @@ def add_sample_leads():
     with session_manager.session_scope() as session:
         repository = LeadRepository(session)
         
-        # Sample leads
+        # Sample leads with CEO/Founder details
         sample_data = [
             {
                 "company_name": "TechFlow Solutions",
                 "website": "https://techflow.example",
                 "industry": "software",
-                "email": "sales@techflow.example",
-                "phone": "+1 (555) 111-1111",
+                "contact_name": "Michael Chen",
+                "contact_title": "CEO & Founder",
+                "contact_email": "michael.chen@techflow.example",
+                "contact_phone": "+1 (555) 111-2001",
                 "status": "qualified",
                 "confidence": 0.95,
                 "source": "website_crawler",
@@ -40,8 +42,10 @@ def add_sample_leads():
                 "company_name": "DataViz Analytics",
                 "website": "https://dataviz.example",
                 "industry": "software",
-                "email": "contact@dataviz.example",
-                "phone": "+1 (555) 222-2222",
+                "contact_name": "Sarah Rodriguez",
+                "contact_title": "Founder & CTO",
+                "contact_email": "sarah@dataviz.example",
+                "contact_phone": "+1 (555) 222-2001",
                 "status": "new",
                 "confidence": 0.88,
                 "source": "website_crawler",
@@ -50,8 +54,10 @@ def add_sample_leads():
                 "company_name": "CloudSync Corp",
                 "website": "https://cloudsync.example",
                 "industry": "cloud",
-                "email": "info@cloudsync.example",
-                "phone": "+1 (555) 333-3333",
+                "contact_name": "James Patterson",
+                "contact_title": "President & CEO",
+                "contact_email": "james.patterson@cloudsync.example",
+                "contact_phone": "+1 (555) 333-2001",
                 "status": "qualified",
                 "confidence": 0.92,
                 "source": "opencorporates",
@@ -60,8 +66,10 @@ def add_sample_leads():
                 "company_name": "Secure Networks Inc",
                 "website": "https://securenetworks.example",
                 "industry": "security",
-                "email": "business@securenetworks.example",
-                "phone": "+1 (555) 444-4444",
+                "contact_name": "Dr. Priya Sharma",
+                "contact_title": "Founder & Chief Security Officer",
+                "contact_email": "priya.sharma@securenetworks.example",
+                "contact_phone": "+1 (555) 444-2001",
                 "status": "new",
                 "confidence": 0.85,
                 "source": "website_crawler",
@@ -70,8 +78,10 @@ def add_sample_leads():
                 "company_name": "Mobile Innovations",
                 "website": "https://mobileinnovations.example",
                 "industry": "mobile",
-                "email": "partnerships@mobileinnovations.example",
-                "phone": "+1 (555) 555-5555",
+                "contact_name": "David Thompson",
+                "contact_title": "Owner & Executive Director",
+                "contact_email": "david.thompson@mobileinnovations.example",
+                "contact_phone": "+1 (555) 555-2001",
                 "status": "contacted",
                 "confidence": 0.90,
                 "source": "business_registry",
@@ -86,11 +96,17 @@ def add_sample_leads():
                 industry=data["industry"],
             )
             
+            # Parse contact name
+            names = data["contact_name"].split(" ", 1)
+            first_name = names[0]
+            last_name = names[1] if len(names) > 1 else ""
+            
             contact = Contact(
-                first_name="Sales",
-                last_name="Team",
-                email=data["email"],
-                phone=data["phone"],
+                first_name=first_name,
+                last_name=last_name,
+                email=data["contact_email"],
+                phone=data["contact_phone"],
+                title=data["contact_title"],
             )
             
             lead = Lead(

@@ -25,6 +25,7 @@ class LeadORM(Base):
     company_industry: Mapped[str | None] = mapped_column(String(100), nullable=True)
     contact_first_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
     contact_last_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    contact_title: Mapped[str | None] = mapped_column(String(255), nullable=True)
     contact_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
     contact_phone: Mapped[str | None] = mapped_column(String(50), nullable=True)
     source: Mapped[str] = mapped_column(String(255), nullable=False)

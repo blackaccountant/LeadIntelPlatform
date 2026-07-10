@@ -143,6 +143,7 @@ class LeadRepository:
             company_industry=(lead.company.industry.value if isinstance(lead.company.industry, Enum) else lead.company.industry),
             contact_first_name=lead.contact.first_name,
             contact_last_name=lead.contact.last_name,
+            contact_title=lead.contact.title,
             contact_email=lead.contact.email,
             contact_phone=lead.contact.phone,
             source=lead.source,
@@ -168,6 +169,7 @@ class LeadRepository:
         contact = {
             "first_name": orm_lead.contact_first_name,
             "last_name": orm_lead.contact_last_name,
+            "title": orm_lead.contact_title,
             "email": orm_lead.contact_email,
             "phone": orm_lead.contact_phone,
         }

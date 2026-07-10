@@ -63,6 +63,10 @@ class LeadsDashboard {
                 id: "1",
                 company: { name: "Northwind Traders" },
                 website: "https://northwind.example",
+                contact_name: "Robert King",
+                contact_title: "CEO & Founder",
+                contact_email: "robert.king@northwind.example",
+                contact_phone: "+1 (555) 123-4567",
                 email: "info@northwind.example",
                 phone: "+1 (555) 123-4567",
                 status: "qualified",
@@ -73,6 +77,10 @@ class LeadsDashboard {
                 id: "2",
                 company: { name: "Contoso Corporation" },
                 website: "https://contoso.example",
+                contact_name: "Emily Peterson",
+                contact_title: "Founder & President",
+                contact_email: "emily.peterson@contoso.example",
+                contact_phone: "+1 (555) 234-5678",
                 email: "sales@contoso.example",
                 phone: "+1 (555) 234-5678",
                 status: "new",
@@ -83,6 +91,10 @@ class LeadsDashboard {
                 id: "3",
                 company: { name: "Fabrikam Inc" },
                 website: "https://fabrikam.example",
+                contact_name: "Marcus Johnson",
+                contact_title: "Owner & Executive Director",
+                contact_email: "marcus.johnson@fabrikam.example",
+                contact_phone: "+1 (555) 345-6789",
                 email: "contact@fabrikam.example",
                 phone: "+1 (555) 345-6789",
                 status: "contacted",
@@ -116,6 +128,8 @@ class LeadsDashboard {
                 !this.searchQuery ||
                 lead.company.name.toLowerCase().includes(this.searchQuery) ||
                 (lead.email && lead.email.toLowerCase().includes(this.searchQuery)) ||
+                (lead.contact_email && lead.contact_email.toLowerCase().includes(this.searchQuery)) ||
+                (lead.contact_name && lead.contact_name.toLowerCase().includes(this.searchQuery)) ||
                 (lead.website && lead.website.toLowerCase().includes(this.searchQuery));
             return matchesFilter && matchesSearch;
         });
@@ -156,8 +170,10 @@ class LeadsDashboard {
     renderRow(lead) {
         const companyName = lead.company?.name || "N/A";
         const website = lead.website || "N/A";
-        const email = lead.email || "N/A";
-        const phone = lead.phone || "N/A";
+        const contactName = lead.contact_name || "N/A";
+        const contactTitle = lead.contact_title || "N/A";
+        const contactEmail = lead.contact_email || "N/A";
+        const contactPhone = lead.contact_phone || "N/A";
         const statusBadgeClass = `status-${lead.status || "new"}`;
         const statusText = (lead.status || "new").toUpperCase();
         const score = (lead.confidence_score * 100).toFixed(0);
@@ -166,8 +182,9 @@ class LeadsDashboard {
             <tr>
                 <td>${this.escape(companyName)}</td>
                 <td><a href="${this.escape(website)}" target="_blank">${this.escape(website)}</a></td>
-                <td><a href="mailto:${this.escape(email)}">${this.escape(email)}</a></td>
-                <td><a href="tel:${this.escape(phone)}">${this.escape(phone)}</a></td>
+                <td><strong>${this.escape(contactName)}</strong><br><small>${this.escape(contactTitle)}</small></td>
+                <td><a href="mailto:${this.escape(contactEmail)}">${this.escape(contactEmail)}</a></td>
+                <td><a href="tel:${this.escape(contactPhone)}">${this.escape(contactPhone)}</a></td>
                 <td><span class="status-badge ${statusBadgeClass}">${statusText}</span></td>
                 <td>${score}%</td>
                 <td><button class="btn btn-secondary" onclick="alert('Feature coming soon')">View</button></td>
@@ -200,12 +217,14 @@ class LeadsDashboard {
     }
 
     exportCSV() {
-        const headers = ["Company", "Website", "Email", "Phone", "Status", "Score"];
+        const headers = ["Company", "Website", "Contact Name", "Contact Title", "Contact Email", "Contact Phone", "Status", "Score"];
         const rows = this.filteredLeads.map((lead) => [
             lead.company?.name || "",
             lead.website || "",
-            lead.email || "",
-            lead.phone || "",
+            lead.contact_name || "",
+            lead.contact_title || "",
+            lead.contact_email || "",
+            lead.contact_phone || "",
             lead.status || "",
             (lead.confidence_score * 100).toFixed(0),
         ]);
