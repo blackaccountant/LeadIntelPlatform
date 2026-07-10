@@ -41,6 +41,53 @@
             </div>
         </section>
 
+        <section class="campaign-engine">
+            <div class="campaign-header">
+                <h3>Campaign Engine</h3>
+                <p>Discover real leads by scraping live sources</p>
+            </div>
+            <div class="campaign-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="camp-source">Source</label>
+                        <select id="camp-source" class="form-control">
+                            <option value="opencorporates">OpenCorporates (company registry)</option>
+                            <option value="website">Analyze a single website</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="group-keyword">
+                        <label for="camp-keyword">Keyword</label>
+                        <input type="text" id="camp-keyword" class="form-control" placeholder="e.g. fintech, SaaS, logistics" value="software" />
+                    </div>
+                    <div class="form-group" id="group-industry">
+                        <label for="camp-industry">Industry (optional)</label>
+                        <input type="text" id="camp-industry" class="form-control" placeholder="e.g. software, retail" />
+                    </div>
+                    <div class="form-group" id="group-location">
+                        <label for="camp-location">Location</label>
+                        <input type="text" id="camp-location" class="form-control" placeholder="US, GB, us_ca…" value="US" />
+                    </div>
+                    <div class="form-group" id="group-limit">
+                        <label for="camp-limit">Limit</label>
+                        <input type="number" id="camp-limit" class="form-control" min="1" max="100" value="20" />
+                    </div>
+                    <div class="form-group" id="group-website" style="display:none">
+                        <label for="camp-website">Website URL</label>
+                        <input type="text" id="camp-website" class="form-control" placeholder="https://example.com" />
+                    </div>
+                </div>
+                <div class="campaign-controls">
+                    <button class="btn btn-engine" id="start-campaign-btn">▶ Run Campaign</button>
+                    <div class="campaign-status" id="campaign-status" style="display:none">
+                        <div class="progress-bar-wrap">
+                            <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+                        </div>
+                        <span id="campaign-message">Starting…</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="filters">
             <div class="filter-group">
                 <input
