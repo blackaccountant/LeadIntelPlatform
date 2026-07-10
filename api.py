@@ -160,13 +160,17 @@ def create_api_app(db_manager: DatabaseManager) -> Flask:
                     from adapters.opencorporates.adapter import OpenCorporatesAdapter
                     from adapters.website.adapter import WebsiteAdapter
                     from adapters.business_directory.adapter import BusinessDirectoryAdapter
+                    from adapters.directory_crawler.adapter import DirectoryCrawlerAdapter
                     from services.campaign_service import CampaignCriteria, CampaignManager
 
                     _jobs[job_id]["message"] = "Initializing adapters…"
                     _jobs[job_id]["progress"] = 10
 
                     adapters = []
-                    if website_url:
+                    if source == "directory":
+                        # Crawl a business directory listing page
+                        adapters.append(DirectoryCrawlerAdapter())
+                    elif website_url:
                         adapters.append(WebsiteAdapter())
                     elif source == "opencorporates":
                         adapters.append(OpenCorporatesAdapter())
@@ -187,7 +191,30 @@ def create_api_app(db_manager: DatabaseManager) -> Flask:
                     _jobs[job_id]["progress"] = 30
 
                     # If website_url, override the fetch call
-                    if website_url:
+                    if source == "directory" and website_url:
+                        dir_adapter = adapters[0]
+                        _jobs[job_id]["message"] = "Crawling directory listing pages…"
+                        _jobs[job_id]["progress"] = 30
+                        raw_leads = dir_adapter.fetch(
+                            url=website_url,
+                            keyword=keyword,
+                            location=location,
+                            page_limit=3,
+                        )
+                        _jobs[job_id]["progress"] = 70
+                        _jobs[job_id]["message"] = f"Saving {len(raw_leads)} discovered leads…"
+                        saved = 0
+                        with session_manager.session_scope() as session:
+                            repo = LeadRepository(session)
+                            for lead in raw_leads:
+                                try:
+                                    repo.create_lead(lead)
+                                    session.commit()
+                                    saved += 1
+                                except Exception:
+                                    pass
+                        summary = {"discovered": len(raw_leads), "saved": saved, "source": f"directory:{website_url}"}
+                    elif website_url:
                         web_adapter = adapters[0]
                         raw_leads = web_adapter.fetch(url=website_url)
                         _jobs[job_id]["progress"] = 70

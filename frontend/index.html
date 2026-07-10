@@ -51,28 +51,33 @@
                     <div class="form-group">
                         <label for="camp-source">Source</label>
                         <select id="camp-source" class="form-control">
+                            <option value="directory">Business Directory (crawl any listing site)</option>
                             <option value="opencorporates">OpenCorporates (company registry)</option>
-                            <option value="website">Analyze a single website</option>
+                            <option value="website">Analyze a single company website</option>
                         </select>
                     </div>
-                    <div class="form-group" id="group-keyword">
-                        <label for="camp-keyword">Keyword</label>
-                        <input type="text" id="camp-keyword" class="form-control" placeholder="e.g. fintech, SaaS, logistics" value="software" />
+                    <div class="form-group" id="group-dir-url">
+                        <label for="camp-dir-url">Directory URL</label>
+                        <input type="text" id="camp-dir-url" class="form-control" placeholder="https://www.allbiz.com/businesses/software/California" />
                     </div>
-                    <div class="form-group" id="group-industry">
-                        <label for="camp-industry">Industry (optional)</label>
-                        <input type="text" id="camp-industry" class="form-control" placeholder="e.g. software, retail" />
+                    <div class="form-group" id="group-keyword">
+                        <label for="camp-keyword">Keyword <small>(optional)</small></label>
+                        <input type="text" id="camp-keyword" class="form-control" placeholder="e.g. fintech, SaaS" />
                     </div>
                     <div class="form-group" id="group-location">
-                        <label for="camp-location">Location</label>
-                        <input type="text" id="camp-location" class="form-control" placeholder="US, GB, us_ca…" value="US" />
+                        <label for="camp-location">Location <small>(optional)</small></label>
+                        <input type="text" id="camp-location" class="form-control" placeholder="California, US, GB…" />
+                    </div>
+                    <div class="form-group" id="group-industry">
+                        <label for="camp-industry">Industry <small>(optional)</small></label>
+                        <input type="text" id="camp-industry" class="form-control" placeholder="e.g. software, retail" />
                     </div>
                     <div class="form-group" id="group-limit">
-                        <label for="camp-limit">Limit</label>
+                        <label for="camp-limit">Limit (pages ×20)</label>
                         <input type="number" id="camp-limit" class="form-control" min="1" max="100" value="20" />
                     </div>
                     <div class="form-group" id="group-website" style="display:none">
-                        <label for="camp-website">Website URL</label>
+                        <label for="camp-website">Company Website URL</label>
                         <input type="text" id="camp-website" class="form-control" placeholder="https://example.com" />
                     </div>
                 </div>
