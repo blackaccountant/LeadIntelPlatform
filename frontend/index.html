@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lead Intelligence Platform - Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-brand">
+                <h1>Lead Intelligence Platform</h1>
+                <p class="tagline">AI-Powered B2B Lead Discovery & Enrichment</p>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="hero">
+            <h2>Campaign Dashboard</h2>
+            <p>Real-time insights into your lead discovery campaigns</p>
+        </section>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="total-leads">0</div>
+                <div class="stat-label">Total Leads</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="qualified-leads">0</div>
+                <div class="stat-label">Qualified Leads</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="pending-leads">0</div>
+                <div class="stat-label">Pending Review</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="conversion-rate">0%</div>
+                <div class="stat-label">Qualification Rate</div>
+            </div>
+        </section>
+
+        <section class="filters">
+            <div class="filter-group">
+                <input
+                    type="text"
+                    id="search-input"
+                    placeholder="Search by company name, email, or domain..."
+                    class="search-box"
+                />
+            </div>
+            <div class="filter-buttons">
+                <button class="btn btn-filter" data-filter="all">All</button>
+                <button class="btn btn-filter" data-filter="new">New</button>
+                <button class="btn btn-filter" data-filter="qualified">Qualified</button>
+                <button class="btn btn-filter" data-filter="rejected">Rejected</button>
+            </div>
+        </section>
+
+        <section class="leads-table-wrapper">
+            <table class="leads-table">
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Website</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Score</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="leads-tbody">
+                    <tr>
+                        <td colspan="7" class="empty-state">No leads available. Run a campaign to get started.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="pagination">
+            <button class="btn btn-pagination" id="prev-btn" disabled>← Previous</button>
+            <span id="page-info">Page 1</span>
+            <button class="btn btn-pagination" id="next-btn" disabled>Next →</button>
+        </section>
+
+        <section class="actions">
+            <button class="btn btn-primary" id="export-btn">📥 Export CSV</button>
+            <button class="btn btn-secondary" id="refresh-btn">🔄 Refresh</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Lead Intelligence Platform. All rights reserved.</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

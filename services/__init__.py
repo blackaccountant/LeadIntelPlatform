@@ -1,13 +1,16 @@
-"""
-Services Package
-================
+"""Services package for orchestration, qualification, and campaign workflows."""
 
-Business logic and service layer implementations.
+from .campaign_service import CampaignCriteria, CampaignManager, CampaignSummary
+from .lead_ingestion_service import LeadIngestionService
+from .qualification_service import LeadQualificationService, QualificationResult
 
-Modules:
-    - lead_service: Lead discovery and management
-    - (future) enrichment_service: Enrichment orchestration
-    - (future) pipeline_service: Data pipeline orchestration
-"""
+__all__ = [
+    "CampaignCriteria",
+    "CampaignManager",
+    "CampaignSummary",
+    "LeadIngestionService",
+    "LeadQualificationService",
+    "QualificationResult",
+]
 
 __version__ = "0.1.0"

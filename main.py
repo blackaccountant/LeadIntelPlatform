@@ -23,6 +23,8 @@ from adapters.business_directory import BusinessDirectoryAdapter
 from adapters.opencorporates import OpenCorporatesAdapter
 from adapters.website import WebsiteAdapter
 from models import Lead
+from services.campaign_service import CampaignCriteria, CampaignManager
+from services.dashboard_service import DashboardSummary, render_dashboard_html
 from services.lead_ingestion_service import LeadIngestionService
 
 
@@ -108,8 +110,27 @@ def configure_arg_parser() -> argparse.ArgumentParser:
     export_parser = subparsers.add_parser("export", help="Export all stored leads to CSV")
     export_parser.add_argument("--output", default="exports/all_leads.csv", help="CSV destination path")
 
+    campaign_parser = subparsers.add_parser("campaign", help="Run an adapter-driven lead discovery campaign")
+    campaign_parser.add_argument("--country", default="US", help="Country code or country name")
+    campaign_parser.add_argument("--state", default=None, help="State or region")
+    campaign_parser.add_argument("--city", default=None, help="City")
+    campaign_parser.add_argument("--industry", default=None, help="Industry keyword")
+    campaign_parser.add_argument("--keyword", default=None, help="Search keyword")
+    campaign_parser.add_argument("--limit", type=int, default=100, help="Maximum number of leads to process")
+    campaign_parser.add_argument("--export", default=None, help="Optional CSV export path")
+    campaign_parser.add_argument("--ai", action="store_true", help="Enable enrichment mode (stubbed for compatibility)")
+    campaign_parser.add_argument("--dry-run", action="store_true", help="Validate campaign inputs without persisting")
+
     analyze_parser = subparsers.add_parser("analyze-website", help="Analyze a company website")
     analyze_parser.add_argument("url", help="Company website URL")
+
+    dashboard_parser = subparsers.add_parser("dashboard", help="Render a local HTML dashboard")
+    dashboard_parser.add_argument("--output", default="exports/dashboard.html", help="Path to write the dashboard HTML")
+
+    api_parser = subparsers.add_parser("api", help="Start the REST API server")
+    api_parser.add_argument("--host", default="0.0.0.0", help="API server host")
+    api_parser.add_argument("--port", type=int, default=5000, help="API server port")
+    api_parser.add_argument("--debug", action="store_true", help="Enable debug mode")
 
     stats_parser = subparsers.add_parser("stats", help="Show lead repository statistics")
 
@@ -159,6 +180,57 @@ def main(args: Optional[list[str]] = None) -> int:
                 print(f"Phone: {lead.contact.phone or ''}")
             else:
                 print("No website intelligence found")
+
+        elif parsed.command == "campaign":
+            criteria = CampaignCriteria(
+                country=parsed.country,
+                state=parsed.state,
+                city=parsed.city,
+                industry=parsed.industry,
+                keyword=parsed.keyword,
+                limit=parsed.limit,
+                ai=parsed.ai,
+                dry_run=parsed.dry_run,
+                export=parsed.export,
+            )
+            adapters = [
+                BusinessDirectoryAdapter(category=criteria.industry or "software", location=criteria.state or criteria.country or "United States"),
+                OpenCorporatesAdapter(),
+            ]
+            with session_manager.session_scope() as session:
+                repository = LeadRepository(session)
+                manager = CampaignManager(repository)
+                summary = manager.run(adapters, criteria)
+            print(f"Campaign complete: discovered={summary.discovered}, qualified={summary.qualified}, rejected={summary.rejected}, saved={summary.saved}")
+            if summary.output_path:
+                print(f"Exported campaign results to {summary.output_path}")
+
+        elif parsed.command == "dashboard":
+            with session_manager.session_scope() as session:
+                repository = LeadRepository(session)
+                leads = repository.list_all_leads()
+            summary = DashboardSummary(
+                total_leads=len(leads),
+                qualified_leads=sum(1 for lead in leads if getattr(lead, "status", None) == "qualified"),
+                pending_leads=sum(1 for lead in leads if getattr(lead, "status", None) in {"new", "contacted"}),
+                exported_leads=0,
+            )
+            html = render_dashboard_html(leads, summary)
+            output_path = Path(parsed.output)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_text(html, encoding="utf-8")
+            print(f"Dashboard written to {output_path}")
+
+        elif parsed.command == "api":
+            try:
+                from api import create_api_app
+            except ImportError:
+                logger.error("Flask is not installed. Install with: pip install flask flask-cors")
+                print("Error: Flask is not installed. Install with: pip install flask flask-cors")
+                return 1
+            app = create_api_app(db_manager)
+            print(f"Starting API server on {parsed.host}:{parsed.port}")
+            app.run(host=parsed.host, port=parsed.port, debug=parsed.debug)
 
         elif parsed.command == "stats":
             with session_manager.session_scope() as session:

@@ -56,7 +56,38 @@ LeadIntelPlatform/
 └── README.md               # This file
 ```
 
-## Installation
+## 🚀 Quick Start
+
+**Get running in 5 minutes:**
+
+```bash
+# 1. Install dependencies
+pip install -r requirements.txt
+
+# 2. Add sample data
+python add_sample_leads.py
+
+# 3. Start API server
+python main.py api
+
+# 4. View dashboard
+open frontend/index.html  # or start: python serve_frontend.py
+```
+
+**See [QUICKSTART.md](QUICKSTART.md) for detailed setup instructions.**
+
+## 📖 Documentation
+
+| Document | Purpose |
+|----------|---------|
+| **[QUICKSTART.md](QUICKSTART.md)** | 5-minute setup guide |
+| **[API_REFERENCE.md](API_REFERENCE.md)** | Complete API documentation |
+| **[DEPLOYMENT.md](DEPLOYMENT.md)** | Production deployment guide |
+| **[COMPLETION_SUMMARY.md](COMPLETION_SUMMARY.md)** | What's been delivered |
+| **[DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** | Navigation guide |
+| **[frontend/README.md](frontend/README.md)** | Dashboard features |
+
+## Installation (Detailed)
 
 ### 1. Clone or initialize the project
 
@@ -87,7 +118,7 @@ cp .env.example .env
 ### 5. Verify installation
 
 ```bash
-python main.py
+python -m pytest -v  # Run tests: should see 10/10 PASSED
 ```
 
 ## Configuration
